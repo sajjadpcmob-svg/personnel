@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه خوداظهاری پرسنل</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --white:#FFFFFF;--bg:#F8FFFE;--card:#FFFFFF;
+            --red:#D32F2F;--red-light:#EF5350;--red-dark:#B71C1C;--red-bg:#FFEBEE;--red-border:#FFCDD2;
+            --green:#43A047;--green-light:#66BB6A;--green-bg:#E8F5E9;--green-border:#C8E6C9;
+            --text:#1A1A1A;--text-soft:#555;--text-muted:#999;
+            --gray:#757575;--gray-light:#E0E0E0;--gray-bg:#F5F5F5;
+            --shadow:0 2px 12px rgba(0,0,0,.06);--shadow-md:0 4px 20px rgba(0,0,0,.08);--shadow-lg:0 8px 40px rgba(0,0,0,.12);
+            --radius:14px;--radius-sm:10px;--radius-xs:8px;
+            --transition:.3s cubic-bezier(.4,0,.2,1);
+        }
+        body{font-family:'Vazirmatn',Tahoma,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.8;min-height:100vh;overflow-x:hidden}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--gray-bg)}::-webkit-scrollbar-thumb{background:var(--red-light);border-radius:6px}
+
+        /* ══════ TOP BAR ══════ */
+        .top-bar{background:linear-gradient(135deg,var(--red-dark),var(--red));color:#fff;padding:10px 28px;display:flex;align-items:center;justify-content:space-between;font-size:13px;gap:12px;flex-wrap:wrap;box-shadow:0 2px 12px rgba(211,47,47,.3)}
+        .top-bar .brand{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+        .top-bar .brand .icon{width:28px;height:28px;background:rgba(255,255,255,.2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
+        .admin-toggle{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 16px;border-radius:var(--radius-xs);cursor:pointer;font-family:inherit;font-size:12px;transition:var(--transition)}
+        .admin-toggle:hover{background:rgba(255,255,255,.25)}
+
+        /* ══════ ADMIN PANEL ══════ */
+        .admin-panel{display:none;background:var(--card);box-shadow:var(--shadow-md);border-bottom:3px solid var(--red)}
+        .admin-panel.show{display:block}
+
+        /* Admin Tabs */
+        .admin-tabs{display:flex;gap:0;border-bottom:2px solid var(--gray-light);padding:0 20px;background:var(--gray-bg)}
+        .admin-tab{padding:12px 22px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--gray);border:none;background:none;border-bottom:3px solid transparent;transition:var(--transition);display:flex;align-items:center;gap:6px}
+        .admin-tab:hover{color:var(--red);background:var(--red-bg)}
+        .admin-tab.active{color:var(--red);border-bottom-color:var(--red);background:var(--card)}
+        .admin-content{padding:20px 24px}
+        .admin-tab-content{display:none}
+        .admin-tab-content.active{display:block}
+
+        /* Login */
+        .admin-login{padding:24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+        .admin-login label{font-size:13px;font-weight:600;color:var(--text-soft)}
+        .admin-login input{padding:10px 16px;border:2px solid var(--gray-light);border-radius:var(--radius-xs);font-family:inherit;font-size:14px;outline:none;width:220px;transition:var(--transition)}
+        .admin-login input:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(211,47,47,.1)}
+
+        .admin-btn{padding:10px 22px;border:none;border-radius:var(--radius-xs);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:6px}
+        .btn-login{background:var(--red);color:#fff}.btn-login:hover{background:var(--red-dark)}
+        .btn-logout{background:var(--gray);color:#fff}.btn-logout:hover{background:#616161}
+        .btn-export{background:var(--green);color:#fff}.btn-export:hover{background:#2E7D32}
+        .btn-sm{padding:7px 14px;font-size:12px;border-radius:6px}
+        .btn-add{background:var(--green);color:#fff}.btn-add:hover{background:#2E7D32;transform:translateY(-1px)}
+        .btn-del{background:var(--red);color:#fff}.btn-del:hover{background:var(--red-dark)}
+        .btn-save{background:var(--red);color:#fff}.btn-save:hover{background:var(--red-dark)}
+        .btn-outline{background:none;border:2px solid var(--gray-light);color:var(--text-soft)}.btn-outline:hover{border-color:var(--red);color:var(--red)}
+
+        /* Stats */
+        .admin-stats{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+        .stat-card{background:var(--card);border:2px solid var(--green-border);border-radius:var(--radius-sm);padding:16px 22px;min-width:110px;text-align:center;box-shadow:var(--shadow);transition:var(--transition)}
+        .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+        .stat-card .num{font-size:28px;font-weight:900;color:var(--red)}.stat-card .lbl{font-size:11px;color:var(--gray)}
+
+        /* Search */
+        .admin-search{display:flex;gap:10px;margin-bottom:16px}
+        .admin-search input{flex:1;padding:10px 16px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);font-family:inherit;font-size:14px;outline:none;transition:var(--transition)}
+        .admin-search input:focus{border-color:var(--red)}
+
+        /* Table */
+        .records-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border-radius:var(--radius-sm);overflow:hidden;font-size:13px;box-shadow:var(--shadow)}
+        .records-table th{background:linear-gradient(135deg,var(--red-dark),var(--red));color:#fff;padding:12px 8px;font-weight:700;font-size:11px;white-space:nowrap}
+        .records-table td{padding:10px 6px;border-bottom:1px solid var(--gray-bg);text-align:center;font-size:12px}
+        .records-table tr:hover td{background:var(--red-bg)}
+        .action-btn{border:none;border-radius:6px;padding:5px 10px;font-family:inherit;font-size:11px;cursor:pointer;transition:var(--transition);font-weight:600;margin:0 2px}
+        .view-btn{background:var(--green);color:#fff}.view-btn:hover{background:#2E7D32}
+        .del-btn{background:var(--red);color:#fff}.del-btn:hover{background:var(--red-dark)}
+
+        /* Form Builder */
+        .section-config{background:var(--card);border:2px solid var(--gray-light);border-radius:var(--radius-sm);padding:18px;margin-bottom:14px;transition:var(--transition)}
+        .section-config:hover{border-color:var(--red-light)}
+        .section-config .sc-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+        .section-config .sc-head .sc-icon{width:36px;height:36px;background:var(--red);color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+        .section-config .sc-head h3{font-size:15px;font-weight:800;color:var(--text)}
+        .sc-field{margin-bottom:10px}
+        .sc-field label{font-size:12px;font-weight:600;color:var(--text-soft);margin-bottom:4px;display:block}
+        .sc-field input,.sc-field textarea,.sc-field select{width:100%;padding:9px 13px;border:2px solid var(--gray-light);border-radius:var(--radius-xs);font-family:inherit;font-size:13px;outline:none;transition:var(--transition)}
+        .sc-field input:focus,.sc-field textarea:focus,.sc-field select:focus{border-color:var(--red)}
+        .sc-field textarea{min-height:80px;resize:vertical}
+        .sc-field .hint{font-size:10px;color:var(--text-muted);margin-top:3px}
+
+        /* Halls config */
+        .hall-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+        .hall-item{background:var(--green-bg);border:2px solid var(--green-border);border-radius:20px;padding:6px 16px;font-size:13px;font-weight:600;color:var(--green);display:flex;align-items:center;gap:8px;transition:var(--transition)}
+        .hall-item:hover{border-color:var(--green)}
+        .hall-item .hall-del{cursor:pointer;color:var(--red);font-weight:700;font-size:16px;background:none;border:none;transition:var(--transition)}
+        .hall-item .hall-del:hover{color:var(--red-dark);transform:scale(1.2)}
+        .hall-add-row{display:flex;gap:8px;margin-bottom:14px}
+        .hall-add-row input{flex:1;padding:10px 14px;border:2px solid var(--gray-light);border-radius:var(--radius-xs);font-family:inherit;font-size:13px;outline:none}
+        .hall-add-row input:focus{border-color:var(--green)}
+
+        /* ══════ WELCOME PAGE ══════ */
+        .welcome-page{display:flex;min-height:calc(100vh - 50px);flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 24px;text-align:center;position:relative;overflow:hidden}
+        .welcome-page::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(67,160,71,.06) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(211,47,47,.04) 0%,transparent 60%);pointer-events:none}
+        .welcome-inner{position:relative;z-index:1;max-width:800px;width:100%;display:flex;flex-direction:column;align-items:center}
+
+        /* Logo — ~1/3 of page */
+        .logo-area{width:33vw;max-width:320px;min-width:200px;aspect-ratio:1;margin:0 auto 12px;position:relative;border-radius:22px;overflow:hidden;cursor:pointer;box-shadow:0 4px 24px rgba(0,0,0,.08);transition:var(--transition);background:var(--card)}
+        .logo-area:hover{transform:scale(1.02);box-shadow:0 6px 30px rgba(0,0,0,.12)}
+        .logo-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:3px dashed var(--red-border);border-radius:22px;color:var(--text-muted);font-size:14px;transition:var(--transition)}
+        .logo-placeholder .icon{font-size:56px;opacity:.4}
+        .logo-area:hover .logo-placeholder{border-color:var(--red);background:var(--red-bg)}
+        .logo-area img{width:100%;height:100%;object-fit:contain}
+        .logo-area input[type=file]{display:none}
+
+        /* Slogan box */
+        .slogan-box{width:100%;max-width:600px;background:linear-gradient(135deg,var(--red-bg),var(--green-bg));border:2px solid var(--green-border);border-radius:var(--radius);padding:14px 28px;margin:0 auto 20px;text-align:center;font-size:18px;font-weight:700;color:var(--red-dark);letter-spacing:1px;line-height:2;min-height:20px}
+        .slogan-box:empty::after{content:attr(data-placeholder);color:var(--text-muted);font-style:italic;font-weight:400;font-size:14px}
+
+        /* Welcome text area */
+        .welcome-text-display{width:100%;max-width:650px;margin:0 auto 24px;text-align:center;font-size:17px;font-weight:500;color:var(--text-soft);line-height:2.2;white-space:pre-wrap;min-height:60px}
+        .welcome-text-display:empty::after{content:attr(data-placeholder);color:var(--text-muted);font-weight:400;font-size:14px;font-style:italic}
+
+        .welcome-divider{width:80px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--green-light));margin:12px auto 24px}
+
+        .start-btn{background:linear-gradient(135deg,var(--red),var(--red-light));color:#fff;border:none;border-radius:var(--radius);padding:16px 52px;font-family:inherit;font-size:18px;font-weight:700;cursor:pointer;transition:var(--transition);box-shadow:0 4px 20px rgba(211,47,47,.3);position:relative;overflow:hidden}
+        .start-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--green),var(--green-light));opacity:0;transition:var(--transition)}
+        .start-btn:hover::before{opacity:1}
+        .start-btn span{position:relative;z-index:1}
+        .start-btn:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(67,160,71,.3)}
+
+        /* ══════ FORM PAGE ══════ */
+        .form-page{display:none;padding:0 20px 50px}
+        .form-page.show{display:block}
+        .form-header{background:linear-gradient(135deg,var(--red-dark),var(--red));color:#fff;padding:28px 24px;text-align:center;margin:0 -20px 0;border-radius:0 0 24px 24px;position:relative;overflow:hidden}
+        .form-header::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:6px;background:linear-gradient(90deg,var(--red),var(--green-light),var(--red))}
+        .form-header h1{font-size:24px;font-weight:900;margin-bottom:6px}
+        .form-header p{font-size:13px;opacity:.85}
+
+        /* Section description shown to user */
+        .sec-desc{background:linear-gradient(to left,var(--green-bg),var(--card));border:2px solid var(--green-border);border-radius:var(--radius-xs);padding:14px 18px;margin-bottom:16px;font-size:13px;color:var(--text-soft);line-height:1.9}
+        .sec-desc .sec-desc-title{font-weight:800;color:var(--red-dark);font-size:14px;margin-bottom:4px}
+
+        /* stepper */
+        .stepper{display:flex;justify-content:center;gap:4px;padding:18px 0 8px;flex-wrap:wrap;position:sticky;top:0;z-index:50;background:var(--bg)}
+        .step-item{display:flex;flex-direction:column;align-items:center;min-width:48px;cursor:pointer}
+        .step-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:var(--transition);background:var(--card);color:var(--gray);border:2.5px solid var(--gray-light)}
+        .step-dot.active{background:var(--red);color:#fff;border-color:var(--red-light);box-shadow:0 0 0 5px rgba(211,47,47,.15);transform:scale(1.08)}
+        .step-dot.done{background:var(--green);color:#fff;border-color:var(--green-light)}
+        .step-dot:hover:not(.active){border-color:var(--red);color:var(--red)}
+        .step-lbl{font-size:10px;color:var(--gray);margin-top:4px;font-weight:500}
+
+        .progress{height:5px;background:var(--gray-bg);border-radius:8px;margin:0 0 24px;overflow:hidden}
+        .progress-fill{height:100%;border-radius:8px;transition:width .5s cubic-bezier(.4,0,.2,1);background:linear-gradient(90deg,var(--red),var(--green-light))}
+
+        /* section card */
+        .sec-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-md);margin-bottom:20px;overflow:visible;display:none;border:1px solid rgba(0,0,0,.04)}.sec-card.active{display:block;animation:slideUp .4s cubic-bezier(.4,0,.2,1)}
+        .sec-card.active{display:block;animation:slideUp .4s cubic-bezier(.4,0,.2,1)}
+        @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .sec-head{padding:18px 22px;border-bottom:3px solid var(--red);display:flex;align-items:center;gap:14px;background:linear-gradient(to left,var(--red-bg),var(--card));border-radius:var(--radius) var(--radius) 0 0}
+        .sec-icon{width:44px;height:44px;background:var(--red);color:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 3px 12px rgba(211,47,47,.25)}
+        .sec-icon.green{background:var(--green);box-shadow:0 3px 12px rgba(67,160,71,.25)}
+        .sec-head h2{font-size:17px;font-weight:800;color:var(--text)}
+        .sec-head p{font-size:11px;color:var(--gray);margin-top:2px}
+        .sec-body{padding:22px}
+
+        /* field grid */
+        .fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+        .field{display:flex;flex-direction:column;gap:6px}
+        .field label{font-size:13px;font-weight:600;color:var(--text-soft);display:flex;align-items:center;gap:4px}
+        .field label .req{color:var(--red);font-size:16px}
+        input[type=text],input[type=tel],input[type=email],input[type=number],input[type=password],select,textarea{
+            width:100%;padding:11px 15px;border:2px solid var(--gray-light);border-radius:var(--radius-xs);font-family:inherit;font-size:14px;color:var(--text);background:var(--white);outline:none;transition:var(--transition)}
+        input:focus,select:focus,textarea:focus{border-color:var(--red);box-shadow:0 0 0 4px rgba(211,47,47,.08)}
+        input:hover,select:hover,textarea:hover{border-color:#BDBDBD}
+        textarea{resize:vertical;min-height:70px}
+        select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 12px center;padding-left:32px}
+        .radio-group{display:flex;flex-wrap:wrap;gap:12px}
+        .radio-label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;padding:8px 16px;border:2px solid var(--gray-light);border-radius:var(--radius-xs);transition:var(--transition)}
+        .radio-label:hover{border-color:var(--red);background:var(--red-bg)}
+        .radio-label.selected{border-color:var(--red);background:var(--red-bg);font-weight:600}
+        .radio-label input{accent-color:var(--red);width:17px;height:17px;cursor:pointer}
+
+        /* ══════ DATE PICKER ══════ */
+        .dp-wrapper{position:relative}
+        .dp-input{cursor:pointer!important;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23D32F2F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cline x1='16' y1='2' x2='16' y2='6'/%3E%3Cline x1='8' y1='2' x2='8' y2='6'/%3E%3Cline x1='3' y1='10' x2='21' y2='10'/%3E%3C/svg%3E") no-repeat left 14px center;padding-left:40px!important}
+        .dp-popup{display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:200;background:var(--card);border:2px solid var(--red-border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:14px;min-width:300px}
+        .dp-popup.show{display:block;animation:dpIn .2s ease}
+        @keyframes dpIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+        .dp-year-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+        .dp-year-row button{background:none;border:1.5px solid var(--gray-light);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:16px;color:var(--text-soft);transition:var(--transition);font-weight:700;line-height:1}
+        .dp-year-row button:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+        .dp-year-row select{flex:1;padding:6px 10px;border:1.5px solid var(--gray-light);border-radius:6px;font-family:inherit;font-size:13px;outline:none;cursor:pointer;appearance:auto;background:var(--white);direction:ltr;text-align:center;font-weight:700}
+        .dp-year-row select:focus{border-color:var(--red)}
+        .dp-month-row{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+        .dp-month-row button{background:none;border:1.5px solid var(--gray-light);border-radius:6px;padding:4px 12px;cursor:pointer;font-family:inherit;font-size:15px;color:var(--text-soft);transition:var(--transition);font-weight:700;line-height:1}
+        .dp-month-row button:hover{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+        .dp-month-row select{flex:1;padding:6px 10px;border:1.5px solid var(--gray-light);border-radius:6px;font-family:inherit;font-size:13px;outline:none;cursor:pointer;appearance:auto;background:var(--white);text-align:center;font-weight:700}
+        .dp-month-row select:focus{border-color:var(--green)}
+        .dp-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+        .dp-dow{font-size:10px;font-weight:800;color:var(--red);padding:5px}
+        .dp-day{padding:6px;border-radius:8px;cursor:pointer;font-size:13px;transition:var(--transition);background:none;border:none;font-family:inherit;color:var(--text);font-weight:500}
+        .dp-day:hover{background:var(--red-bg);color:var(--red);transform:scale(1.1)}
+        .dp-day.sel{background:var(--red);color:#fff;font-weight:700;box-shadow:0 2px 8px rgba(211,47,47,.3)}
+        .dp-day.today{border:2px solid var(--green);font-weight:700}
+        .dp-day.other{color:var(--text-muted);opacity:.4}
+
+        /* ══════ PHOTO ══════ */
+        .photo-upload{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap}
+        .photo-box{width:120px;height:150px;border:3px dashed var(--red-border);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--white);transition:var(--transition);overflow:hidden;position:relative}
+        .photo-box:hover{border-color:var(--red);background:var(--red-bg);transform:scale(1.02)}
+        .photo-box .ph-icon{font-size:30px;color:var(--text-muted)}.photo-box .ph-text{font-size:10px;color:var(--gray)}
+        .photo-box img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+        .photo-box input[type=file]{display:none}
+        .photo-required-tag{background:var(--red-bg);border:2px solid var(--red-border);border-radius:var(--radius-xs);padding:10px 14px;font-size:12px;color:var(--red-dark);font-weight:600;line-height:1.8;margin-top:6px}
+
+        /* ══════ WORK HISTORY ══════ */
+        .work-entry{background:var(--green-bg);border:2px solid var(--green-border);border-radius:var(--radius-sm);padding:16px;margin-bottom:12px;position:relative;transition:var(--transition);animation:slideUp .3s ease}
+        .work-entry:hover{border-color:var(--green);box-shadow:var(--shadow)}
+        .work-entry .entry-num{position:absolute;top:8px;right:12px;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px}
+        .work-entry .remove-entry{position:absolute;top:8px;left:12px;background:var(--red);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+        .work-entry .remove-entry:hover{background:var(--red-dark);transform:scale(1.1)}
+        .add-entry-btn{background:linear-gradient(135deg,var(--green),var(--green-light));color:#fff;border:none;border-radius:var(--radius-xs);padding:12px 24px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:8px;box-shadow:0 3px 12px rgba(67,160,71,.2)}
+        .add-entry-btn:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(67,160,71,.3)}
+        .no-entries{text-align:center;padding:20px;color:var(--text-muted);font-size:13px}
+
+        /* ══════ SKILLS ══════ */
+        .skill-input-row{display:flex;gap:8px;margin-bottom:10px}
+        .skill-input-row input{flex:1}
+        .add-skill-btn{background:linear-gradient(135deg,var(--red),var(--red-light));color:#fff;border:none;border-radius:var(--radius-xs);padding:11px 20px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:var(--transition);white-space:nowrap}
+        .add-skill-btn:hover{transform:translateY(-1px)}
+        .skill-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+        .skill-tag{background:var(--green-bg);border:2px solid var(--green-border);color:var(--green);padding:7px 14px;border-radius:24px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;transition:var(--transition)}
+        .skill-tag:hover{border-color:var(--green)}
+        .skill-tag .remove-skill{cursor:pointer;font-size:16px;color:var(--red);font-weight:700;background:none;border:none;transition:var(--transition)}
+        .skill-tag .remove-skill:hover{color:var(--red-dark);transform:scale(1.2)}
+
+        /* ══════ AGREEMENT ══════ */
+        .agree-box{background:var(--red-bg);border:2px solid var(--red-border);border-radius:var(--radius);padding:20px;margin:12px 0}
+        .agree-box h3{font-size:16px;color:var(--red-dark);margin-bottom:10px}
+        .agree-box p{font-size:13px;color:var(--text-soft);margin-bottom:10px}
+        .agree-box ul{padding-right:20px;margin:10px 0}
+        .agree-box li{font-size:12px;color:var(--text-soft);margin-bottom:6px;line-height:1.7}
+        .agree-check{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;color:var(--red-dark);margin-top:12px}
+        .agree-check input{accent-color:var(--green);width:20px;height:20px;cursor:pointer}
+
+        /* ══════ BUTTONS ══════ */
+        .btn-row{display:flex;justify-content:space-between;padding:16px 22px;border-top:2px solid var(--gray-bg);gap:12px;border-radius:0 0 var(--radius) var(--radius)}
+        .btn{padding:13px 32px;border:none;border-radius:var(--radius-xs);font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;gap:8px}
+        .btn-red{background:linear-gradient(135deg,var(--red),var(--red-light));color:#fff;box-shadow:0 3px 12px rgba(211,47,47,.2)}
+        .btn-red:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(211,47,47,.3)}
+        .btn-gray{background:var(--gray-bg);color:var(--text-soft);border:2px solid var(--gray-light)}
+        .btn-gray:hover{background:var(--gray-light)}
+        .btn-green{background:linear-gradient(135deg,var(--green),var(--green-light));color:#fff;box-shadow:0 3px 12px rgba(67,160,71,.2)}
+        .btn-green:hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(67,160,71,.3)}
+        .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+        /* ══════ SUCCESS ══════ */
+        .success-page{display:none;min-height:calc(100vh - 50px);align-items:center;justify-content:center;flex-direction:column;padding:40px 24px;text-align:center;position:relative}
+        .success-page.show{display:flex}
+        .success-icon{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-light));color:#fff;font-size:48px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 24px rgba(67,160,71,.3);animation:successPop .5s cubic-bezier(.175,.885,.32,1.275)}
+        @keyframes successPop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+        .success-title{font-size:28px;font-weight:900;color:var(--green);margin-bottom:8px}
+        .success-msg{font-size:14px;color:var(--text-soft);margin-bottom:24px}
+        .success-ref{background:var(--text);color:var(--green-light);padding:10px 24px;border-radius:var(--radius-xs);font-size:16px;font-family:monospace;letter-spacing:2px;font-weight:700}
+        .success-new-btn{margin-top:24px;background:linear-gradient(135deg,var(--red),var(--red-light));color:#fff;border:none;border-radius:var(--radius);padding:14px 36px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;transition:var(--transition)}
+        .success-new-btn:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(211,47,47,.3)}
+
+        /* ══════ MODAL ══════ */
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+        .modal-overlay.show{display:flex}
+        .modal-box{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow-lg);max-width:720px;width:100%;max-height:85vh;overflow-y:auto;padding:28px;position:relative;animation:modalIn .3s ease}
+        @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+        .modal-close{background:var(--red);color:#fff;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;position:absolute;top:14px;left:14px;transition:var(--transition);z-index:1}
+        .modal-close:hover{background:var(--red-dark);transform:scale(1.1)}
+        .modal-section{margin-bottom:18px}
+        .modal-section-title{font-size:14px;font-weight:800;color:var(--red-dark);margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--red-border);display:flex;align-items:center;gap:6px}
+        .modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .modal-info-item .mlbl{font-size:11px;color:var(--gray);font-weight:500}
+        .modal-info-item .mval{font-size:14px;font-weight:600;color:var(--text)}
+        .modal-photo{width:80px;height:100px;object-fit:cover;border-radius:var(--radius-xs);border:2px solid var(--red-border)}
+        .modal-work-entry{background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius-xs);padding:10px 14px;margin-bottom:8px}
+
+        /* ══════ RESPONSIVE ══════ */
+        @media(max-width:640px){
+            .fg{grid-template-columns:1fr}.btn-row{flex-direction:column}.btn{width:100%;justify-content:center}
+            .admin-login{flex-direction:column}.admin-login input{width:100%}
+            .modal-info-grid{grid-template-columns:1fr}
+            .form-header h1{font-size:18px}.stepper{gap:2px}.step-dot{width:32px;height:32px;font-size:11px}.step-lbl{font-size:8px}
+            .admin-tabs{flex-wrap:wrap}.admin-tab{padding:8px 14px;font-size:11px}
+            .logo-area{width:55vw;max-width:260px}
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════ TOP BAR ═══════════ -->
+<div class="top-bar">
+    <div class="brand"><div class="icon">📋</div> سامانه خوداظهاری پرسنل</div>
+    <button class="admin-toggle" onclick="toggleAdmin()">🔐 ورود مدیر</button>
+</div>
+
+<!-- ═══════════ ADMIN PANEL (hidden by default, toggle open) ═══════════ -->
+<div class="admin-panel" id="adminPanel">
+    <!-- Login -->
+    <div id="adminLoginForm" class="admin-login">
+        <label>🔑 رمز عبور:</label>
+        <input type="password" id="adminPass" placeholder="رمز عبور مدیر" onkeydown="if(event.key==='Enter')adminLogin()">
+        <button class="admin-btn btn-login" onclick="adminLogin()">ورود</button>
+    </div>
+
+    <!-- Admin Dashboard (after login) -->
+    <div id="adminDashboard" style="display:none">
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchAdminTab('tabRecords',this)">📊 رکوردها</button>
+            <button class="admin-tab" onclick="switchAdminTab('tabBuilder',this)">🔧 طراحی فرم</button>
+            <button class="admin-tab" onclick="switchAdminTab('tabHalls',this)">🏭 سالن‌ها</button>
+            <button class="admin-tab" onclick="switchAdminTab('tabWelcome',this)">🏠 خوشامدگویی</button>
+            <button class="admin-tab" onclick="switchAdminTab('tabPass',this)">🔑 رمز عبور</button>
+        </div>
+        <div class="admin-content">
+
+            <!-- TAB: Records -->
+            <div class="admin-tab-content active" id="tabRecords">
+                <div class="admin-stats" id="adminStats"></div>
+                <div class="admin-search">
+                    <input type="text" id="adminSearch" placeholder="🔍 جستجو: نام، کد پرسنلی، سمت..." oninput="renderAdminTable()">
+                </div>
+                <div style="overflow-x:auto;margin-bottom:14px">
+                    <table class="records-table" id="recordsTable"></table>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="admin-btn btn-export" onclick="exportExcel()">📥 خروجی اکسل</button>
+                    <button class="admin-btn btn-logout" onclick="adminLogout()">🚪 خروج</button>
+                </div>
+            </div>
+
+            <!-- TAB: Form Builder -->
+            <div class="admin-tab-content" id="tabBuilder">
+                <p style="font-size:13px;color:var(--text-soft);margin-bottom:16px">در این بخش عنوان، توضیحات و راهنمای هر قسمت فرم را ویرایش کنید. کاربر موقع پرکردن فرم، این متن‌ها را خواهد دید.</p>
+                <div id="sectionConfigs"></div>
+                <div style="margin-top:14px;text-align:left">
+                    <button class="admin-btn btn-save" onclick="saveSectionConfigs()">💾 ذخیره تنظیمات فرم</button>
+                </div>
+            </div>
+
+            <!-- TAB: Halls -->
+            <div class="admin-tab-content" id="tabHalls">
+                <p style="font-size:13px;color:var(--text-soft);margin-bottom:12px">نام سالن‌های تولید را تعریف کنید. کاربر از لیست انتخاب خواهد کرد.</p>
+                <div class="hall-add-row">
+                    <input type="text" id="newHallInput" placeholder="نام سالن جدید..." onkeydown="if(event.key==='Enter')addHall()">
+                    <button class="admin-btn btn-add" onclick="addHall()">+ افزودن</button>
+                </div>
+                <div class="hall-list" id="hallList"></div>
+            </div>
+
+            <!-- TAB: Welcome -->
+            <div class="admin-tab-content" id="tabWelcome">
+                <p style="font-size:13px;color:var(--text-soft);margin-bottom:12px">صفحه خوشامدگویی، لوگوی سازمان و شعار را تنظیم کنید.</p>
+                <div class="sc-field">
+                    <label>لوگوی سازمان</label>
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div id="adminLogoPreview" style="width:60px;height:60px;border:2px dashed var(--gray-light);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--gray-bg)">
+                            <span style="font-size:24px;color:var(--text-muted)">🏢</span>
+                        </div>
+                        <button class="admin-btn btn-outline" onclick="document.getElementById('adminLogoInput').click()">آپلود لوگو</button>
+                        <input type="file" id="adminLogoInput" accept="image/*" style="display:none" onchange="setAdminLogo(this)">
+                    </div>
+                </div>
+                <div class="sc-field" style="margin-top:14px">
+                    <label>شعار سازمان (زیر لوگو)</label>
+                    <input type="text" id="adminSloganText" placeholder="شعار یا جمله کوتاه سازمان...">
+                    <div class="hint">این متن در کادر زیبا زیر لوگو نمایش داده می‌شود.</div>
+                </div>
+                <div class="sc-field" style="margin-top:14px">
+                    <label>متن خوشامدگویی</label>
+                    <textarea id="adminWelcomeText" style="min-height:150px" placeholder="متن خوشامدگویی یا توضیحات سازمان...&#10;چند سطری قابل نوشتن است"></textarea>
+                    <div class="hint">این متن در صفحه خوشامدگویی نمایش داده می‌شود. چند سطر قابل نوشتن است.</div>
+                </div>
+                <div style="margin-top:14px">
+                    <button class="admin-btn btn-save" onclick="saveWelcomeConfig()">💾 ذخیره</button>
+                </div>
+            </div>
+
+            <!-- TAB: Password -->
+            <div class="admin-tab-content" id="tabPass">
+                <p style="font-size:13px;color:var(--text-soft);margin-bottom:12px">رمز عبور ورود مدیر را تغییر دهید.</p>
+                <div class="sc-field">
+                    <label>رمز عبور فعلی</label>
+                    <input type="password" id="currentPass">
+                </div>
+                <div class="sc-field">
+                    <label>رمز عبور جدید</label>
+                    <input type="password" id="newPass">
+                </div>
+                <div class="sc-field">
+                    <label>تکرار رمز جدید</label>
+                    <input type="password" id="confirmPass">
+                </div>
+                <div style="margin-top:10px">
+                    <button class="admin-btn btn-save" onclick="changePassword()">🔑 تغییر رمز عبور</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ WELCOME PAGE ═══════════ -->
+<div class="welcome-page" id="welcomePage">
+    <div class="welcome-inner">
+        <!-- Logo (1/3 of page) -->
+        <div class="logo-area" id="logoArea" onclick="document.getElementById('logoInput').click()">
+            <div class="logo-placeholder" id="logoPlaceholder">
+                <div class="icon">🏢</div>
+                <div>آپلود لوگو</div>
+            </div>
+            <input type="file" id="logoInput" accept="image/*" onchange="setLogo(this)">
+        </div>
+
+        <!-- Slogan box below logo -->
+        <div class="slogan-box" id="sloganBox" data-placeholder="شعار سازمان اینجا نمایش داده می‌شود"></div>
+
+        <div class="welcome-divider"></div>
+
+        <!-- Welcome text (multi-line, rest of page) -->
+        <div class="welcome-text-display" id="welcomeTextDisplay" data-placeholder="متن خوشامدگویی سازمان..."></div>
+
+        <button class="start-btn" onclick="goToForm()"><span>شروع تکمیل فرم ←</span></button>
+    </div>
+</div>
+
+<!-- ═══════════ FORM PAGE ═══════════ -->
+<div class="form-page" id="formPage">
+    <div class="form-header">
+        <h1>📋 فرم خوداظهاری پرسنل</h1>
+        <p>لطفاً تمامی اطلاعات را با دقت و صحت کامل وارد نمایید</p>
+    </div>
+    <div class="stepper" id="stepper"></div>
+    <div class="progress"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+    <!-- STEP 1: هویتی -->
+    <div class="sec-card active" data-step="1">
+        <div class="sec-head">
+            <div class="sec-icon">👤</div>
+            <div><h2 id="sec1Title">اطلاعات هویتی</h2><p id="sec1Sub">تمامی فیلدها الزامی است</p></div>
+        </div>
+        <div class="sec-body">
+            <div class="sec-desc" id="sec1Desc" style="display:none"><div class="sec-desc-title" id="sec1DescTitle"></div><div id="sec1DescText"></div></div>
+            <div class="photo-upload">
+                <div class="photo-box" id="photoBox" onclick="document.getElementById('photoInput').click()">
+                    <span class="ph-icon" id="photoIcon">📷</span>
+                    <span class="ph-text" id="photoText">عکس ۳×۴</span>
+                    <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(this)">
+                    <img id="photoPreview" style="display:none" alt="عکس">
+                </div>
+                <div class="photo-required-tag">
+                    <div style="color:var(--red);font-weight:700;margin-bottom:4px">⚠️ آپلود عکس الزامی است <span style="color:var(--red);font-size:16px">*</span></div>
+                    <div>📸 فرمت: JPG / PNG</div>
+                    <div>📏 حداکثر حجم: ۲ مگابایت (2 MB)</div>
+                    <div>📐 اندازه: ۳×۴ پرسنلی</div>
+                </div>
+            </div>
+            <div class="fg" style="margin-top:18px">
+                <div class="field"><label>نام <span class="req">*</span></label><input type="text" id="first_name" required></div>
+                <div class="field"><label>نام خانوادگی <span class="req">*</span></label><input type="text" id="last_name" required></div>
+                <div class="field"><label>نام پدر <span class="req">*</span></label><input type="text" id="father_name" required></div>
+                <div class="field"><label>کدملی <span class="req">*</span></label><input type="text" id="national_id" maxlength="10" placeholder="۱۰ رقم" required></div>
+                <div class="field"><label>تاریخ تولد <span class="req">*</span></label>
+                    <div class="dp-wrapper">
+                        <input type="text" class="dp-input" id="birth_date" readonly placeholder="انتخاب از تقویم شمسی" onclick="openDP(this,'birth_dp')">
+                        <div class="dp-popup" id="birth_dp"></div>
+                    </div>
+                </div>
+                <div class="field"><label>محل تولد <span class="req">*</span></label><input type="text" id="birth_place" required></div>
+                <div class="field"><label>جنسیت <span class="req">*</span></label>
+                    <div class="radio-group" id="genderGroup">
+                        <label class="radio-label" onclick="selectRadio(this,'gender')"><input type="radio" name="gender" value="مرد"> مرد</label>
+                        <label class="radio-label" onclick="selectRadio(this,'gender')"><input type="radio" name="gender" value="زن"> زن</label>
+                    </div>
+                </div>
+                <div class="field"><label>وضعیت تاهل <span class="req">*</span></label>
+                    <select id="marital_status" required><option value="">انتخاب</option><option>مجرد</option><option>متأهل</option><option>مطلقه</option><option>همسر فوت شده</option></select>
+                </div>
+                <div class="field"><label>تعداد فرزندان <span class="req">*</span></label><input type="number" id="children_count" min="0" value="0" required></div>
+                <div class="field"><label>ملیت <span class="req">*</span></label><input type="text" id="nationality" value="ایرانی" required></div>
+                <div class="field"><label>گروه خونی <span class="req">*</span></label>
+                    <select id="blood_type" required><option value="">انتخاب</option><option>A+</option><option>A-</</option><option>B+</option><option>B-,</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-,</option></select>
+                </div>
+            </div>
+        </div>
+        <div class="btn-row"><div></div><button class="btn btn-red" onclick="nextStep()">مرحله بعد ←</button></div>
+    </div>
+
+    <!-- STEP 2: تحصیلی -->
+    <div class="sec-card" data-step="2">
+        <div class="sec-head">
+            <div class="sec-icon">🎓</div>
+            <div><h2 id="sec2Title">اطلاعات تحصیلی</h2><p id="sec2Sub">مدرک تحصیلی الزامی است</p></div>
+        </div>
+        <div class="sec-body">
+            <div class="sec-desc" id="sec2Desc" style="display:none"><div class="sec-desc-title" id="sec2DescTitle"></div><div id="sec2DescText"></div></div>
+            <div class="fg">
+                <div class="field"><label>مدرک تحصیلی <span class="req">*</span></label>
+                    <select id="education_level" required><option value="">انتخاب</option><option>سیکل</option><option>دیپلم</option><option>کاردانی</option><option>کارشناسی</option><option>کارشناسی ارشد</option><option>دکتری</option></select>
+                </div>
+                <div class="field"><label>رشته تحصیلی</label><input type="text" id="education_field"></div>
+            </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-gray" onclick="prevStep()">→ مرحله قبل</button><button class="btn btn-red" onclick="nextStep()">مرحله بعد ←</button></div>
+    </div>
+
+    <!-- STEP 3: پرسنلی -->
+    <div class="sec-card" data-step="3">
+        <div class="sec-head">
+            <div class="sec-icon green">🏭</div>
+            <div><h2 id="sec3Title">اطلاعات پرسنلی</h2><p id="sec3Sub">تمامی فیلدها الزامی است</p></div>
+        </div>
+        <div class="sec-body">
+            <div class="sec-desc" id="sec3Desc" style="display:none"><div class="sec-desc-title" id="sec3DescTitle"></div><div id="sec3DescText"></div></div>
+            <div class="fg">
+                <div class="field"><label>سالن تولید <span class="req">*</span></label>
+                    <select id="production_hall" required><option value="">انتخاب سالن</option></select>
+                </div>
+                <div class="field"><label>کد پرسنلی <span class="req">*</span></label><input type="text" id="personnel_code" placeholder="کد پرسنلی سازمان" required></div>
+                <div class="field"><label>تاریخ استخدام <span class="req">*</span></label>
+                    <div class="dp-wrapper">
+                        <input type="text" class="dp-input" id="hire_date" readonly placeholder="انتخاب از تقویم شمسی" onclick="openDP(this,'hire_dp')">
+                        <div class="dp-popup" id="hire_dp"></div>
+                    </div>
+                </div>
+                <div class="field"><label>سمت <span class="req">*</span></label>
+                    <select id="position" required><option value="">انتخاب سمت</option><option>مدیریت</option><option>فنی</option><option>اپراتور</option><option>کارگر</option></select>
+                </div>
+            </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-gray" onclick="prevStep()">→ مرحله قبل</button><button class="btn btn-red" onclick="nextStep()">مرحله بعد ←</button></div>
+    </div>
+
+    <!-- STEP 4: سابقه کار -->
+    <div class="sec-card" data-step="4">
+        <div class="sec-head">
+            <div class="sec-icon green">🏢</div>
+            <div><h2 id="sec4Title">سابقه کار</h2><p id="sec4Sub">شرکت و سازمان‌های قبلی</p></div>
+        </div>
+        <div class="sec-body">
+            <div class="sec-desc" id="sec4Desc" style="display:none"><div class="sec-desc-title" id="sec4DescTitle"></div><div id="sec4DescText"></div></div>
+            <div id="workHistory"><div class="no-entries" id="noEntries">هنوز سابقه کاری اضافه نشده. روی دکمه زیر کلیک کنید.</div></div>
+            <button class="add-entry-btn" onclick="addWorkEntry()">+ افزودن سابقه کار</button>
+        </div>
+        <div class="btn-row"><button class="btn btn-gray" onclick="prevStep()">→ مرحله قبل</button><button class="btn btn-red" onclick="nextStep()">مرحله بعد ←</button></div>
+    </div>
+
+    <!-- STEP 5: تماس -->
+    <div class="sec-card" data-step="5">
+        <div class="sec-head">
+            <div class="sec-icon">📞</div>
+            <div><h2 id="sec5Title">اطلاعات تماس</h2><p id="sec5Sub">تمامی فیلدها الزامی است</p></div>
+        </div>
+        <div class="sec-body">
+            <div class="sec-desc" id="sec5Desc" style="display:none"><div class="sec-desc-title" id="sec5DescTitle"></div><div id="sec5DescText"></div></div>
+            <div class="fg">
+                <div class="field"><label>تلفن همراه <span class="req">*</span></label><input type="tel" id="mobile" placeholder="09xxxxxxxxx" required></div>
+                <div class="field"><label>تلفن ثابت <span class="req">*</span></label><input type="tel" id="phone" placeholder="0xxxxxxxxxx" required></div>
+                <div class="field"><label>شماره تماس ضروری <span class="req">*</span></label><input type="tel" id="emergency_phone" placeholder="شماره تماس در مواقع اضطراری" required></div>
+            </div>
+            <div class="field" style="margin-top:14px"><label>آدرس محل سکونت <span class="req">*</span></label><textarea id="address" placeholder="آدرس کامل محل سکونت" required></textarea></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-gray" onclick="prevStep()">→ مرحله قبل</button><button class="btn btn-red" onclick="nextStep()">مرحله بعد ←</button></div>
+    </div>
+
+    <!-- STEP 6: مهارت‌ها -->
+    <div class="sec-card" data-step="6">
+        <div class="sec-head">
+            <div class="sec-icon green">⚡</div>
+            <div><h2 id="sec6Title">مهارت‌ها و توانمندی‌ها</h2><p id="sec6Sub">هر مهارت را جداگانه اضافه کنید</p></div>
+        </div>
+        <div class="sec-body">
+            <div class="sec-desc" id="sec6Desc" style="display:none"><div class="sec-desc-title" id="sec6DescTitle"></div><div id="sec6DescText"></div></div>
+            <div class="skill-input-row">
+                <input type="text" id="skillInput" placeholder="نام مهارت را وارد کنید..." onkeydown="if(event.key==='Enter')addSkill()">
+                <button class="add-skill-btn" onclick="addSkill()">+ افزودن</button>
+            </div>
+            <div class="skill-tags" id="skillTags"></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-gray" onclick="prevStep()">→ مرحله قبل</button><button class="btn btn-red" onclick="nextStep()">مرحله بعد ←</button></div>
+    </div>
+
+    <!-- STEP 7: ثبت -->
+    <div class="sec-card" data-step="7">
+        <div class="sec-head">
+            <div class="sec-icon">✍️</div>
+            <div><h2 id="sec7Title">تأیید و ثبت نهایی</h2><p id="sec7Sub">بررسی اطلاعات و ارسال</p></div>
+        </div>
+        <div class="sec-body">
+            <div class="sec-desc" id="sec7Desc" style="display:none"><div class="sec-desc-title" id="sec7DescTitle"></div><div id="sec7DescText"></div></div>
+            <div class="agree-box">
+                <h3>⚖️ توافق‌نامه</h3>
+                <p>اینجانب با علم و آگاهی کامل تأیید می‌نمایم که تمامی اطلاعات ارائه شده صحیح و کامل است.</p>
+                <ul>
+                    <li>اطلاعات من در سیستم پرسنلی ثبت و نگهداری شود.</li>
+                    <li>در صورت تغییر اطلاعات، ظرف ۱۵ روز کاری بروزرسانی خواهم کرد.</li>
+                    <li>اطلاعات ارائه شده محرمانه و صرفاً جهت امور اداری استفاده خواهد شد.</li>
+                </ul>
+                <label class="agree-check"><input type="checkbox" id="agreeCheck" onchange="document.getElementById('submitBtn').disabled=!this.checked">تمامی شرایط فوق را مطالعه کرده و قبول دارم.</label>
+            </div>
+        </div>
+        <div class="btn-row"><button class="btn btn-gray" onclick="prevStep()">→ مرحله قبل</button><button class="btn btn-green" id="submitBtn" disabled onclick="submitForm()">✅ ثبت اطلاعات</button></div>
+    </div>
+</div>
+
+<!-- ═══════════ SUCCESS ═══════════ -->
+<div class="success-page" id="successPage">
+    <div class="success-icon">✓</div>
+    <h1 class="success-title">اطلاعات شما با موفقیت ثبت شد</h1>
+    <p class="success-msg">از همکاری شما سپاسگزاریم.</p>
+    <div class="success-ref" id="refCode"></div>
+    <p style="margin-top:12px;font-size:11px;color:var(--text-muted)">کد رهگیری بالا را نزد خود نگهداری نمایید.</p>
+    <button class="success-new-btn" onclick="newForm()">📝 ثبت فرم جدید</button>
+</div>
+
+<!-- ═══════════ MODAL ═══════════ -->
+<div class="modal-overlay" id="viewModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ==========================================
+//  Supabase - database connection
+// ==========================================
+const SUPABASE_URL='https://ownzjgyumjzhmvvozkqf.supabase.co';
+const SUPABASE_KEY='sb_publishable_IqIbb4vuXCuqIrPCkB3ABw_-A1JMJ7z';
+let sb=null;
+try{ if(window.supabase&&window.supabase.createClient){ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY); } }catch(e){ console.error('Supabase init error',e); }
+let SB_READY=false;
+
+function dbRowToRecord(row){
+    const r={...row};
+    r.created_at=row.created_at_fa||row.created_at||'';
+    delete r.created_at_fa;
+    if(!Array.isArray(r.work_history))r.work_history=[];
+    return r;
+}
+function recordToDbRow(rec){
+    const row={...rec};
+    row.created_at_fa=rec.created_at||'';
+    delete row.created_at;
+    return row;
+}
+async function sbLoadAll(){
+    if(!sb)return false;
+    try{
+        const {data:recs,error:e1}=await sb.from('personnel_records').select('*').order('created_at',{ascending:true});
+        if(e1)throw e1;
+        const mapped=(recs||[]).map(dbRowToRecord);
+        localStorage.setItem('personnel_records_v3',JSON.stringify(mapped));
+        const {data:cfgs,error:e2}=await sb.from('app_config').select('*');
+        if(e2)throw e2;
+        (cfgs||[]).forEach(c=>{
+            if(c.key==='production_halls')localStorage.setItem('production_halls',JSON.stringify(c.value||[]));
+            else if(c.key==='section_config')localStorage.setItem('section_config',JSON.stringify(c.value||{}));
+            else if(c.key==='welcome_config')localStorage.setItem('welcome_config_v3',JSON.stringify(c.value||{}));
+            else if(c.key==='admin_password')localStorage.setItem('admin_password',typeof c.value==='string'?c.value:String(c.value));
+        });
+        SB_READY=true;
+        return true;
+    }catch(err){ console.error('sbLoadAll error',err); return false; }
+}
+async function sbUpsertRecord(rec){
+    if(!sb)return;
+    try{ const {error}=await sb.from('personnel_records').upsert(recordToDbRow(rec),{onConflict:'id'}); if(error)throw error; }
+    catch(err){ console.error('sbUpsertRecord error',err); }
+}
+async function sbDeleteRecord(id){
+    if(!sb)return;
+    try{ const {error}=await sb.from('personnel_records').delete().eq('id',id); if(error)throw error; }
+    catch(err){ console.error('sbDeleteRecord error',err); }
+}
+async function sbUpsertConfig(key,value){
+    if(!sb)return;
+    try{ const {error}=await sb.from('app_config').upsert({key:key,value:value,updated_at:new Date().toISOString()},{onConflict:'key'}); if(error)throw error; }
+    catch(err){ console.error('sbUpsertConfig error',err); }
+}
+
+// ==========================================
+//  تقویم شمسی — بازه ۱۳۰۵ تا ۱۴۰۵
+// ==========================================
+const SHAMSI_MIN_YEAR=1305,SHAMSI_MAX_YEAR=1405;
+const shamsiMonths=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const shamsiDOW=['ش','ی','د','س','چ','پ','ج'];
+
+function gregorianToShamsi(gy,gm,gd){
+    let g_d_m=[0,31,59,90,120,151,181,212,243,273,304,334];
+    let jy=(gm<=2)?(gy-1):gy,jm=(gm<=2)?(gm+9):(gm-3);
+    let jd=gd+g_d_m[gm-1];
+    let jdn=365*jy+Math.floor((jy+.25))-.75+Math.floor(jy/100)-Math.floor(jy/400)+jd-1;
+    let ny=Math.floor((jdn-.25)/365.25),nd=Math.floor((jdn-.25)-365.25*ny);
+    let nm=(nd<186)?Math.floor((nd+1)/31):Math.floor((nd-185)/30)+7;
+    let dd=(nd<186)?((nd+1)%31||31):((nd-185)%30||30);
+    return{year:ny,month:nm,day:dd};
+}
+function shamsiToGregorian(jy,jm,jd){
+    let gy=jy+.25,gm=(jm<=7)?(jm+3):(jm-5);
+    let g_d_m=[0,31,59,90,120,151,181,212,243,273,304,334];
+    let gd=jd+g_d_m[gm-1];
+    let gdn=365*gy+Math.floor(gy)-.75+Math.floor(gy/100)-Math.floor(gy/400)+gd-1;
+    let ny=Math.floor((gdn-.25)/365.25),nd=Math.floor((gdn-.25)-365.25*ny);
+    let nm=(nd<186)?Math.floor((nd+1)/31):Math.floor((nd-185)/30)+7;
+    let dd=(nd<186)?((nd+1)%31||31):((nd-185)%30||30);
+    return{year:ny,month:nm,day:dd};
+}
+function shamsiMonthDays(y,m){
+    if(m<=6)return 31;if(m<=11)return 30;
+    let gy=y+.25;return((gy%4===0&&gy%100!==0)||(gy%400===0))?30:29;
+}
+function firstDayOfMonthShamsi(y,m){
+    let g=shamsiToGregorian(y,m,1);return new Date(g.year,g.month-1,g.day).getDay();
+}
+
+let activeDp=null;
+function openDP(input,popupId){
+    if(activeDp&&activeDp!==popupId){document.getElementById(activeDp).classList.remove('show')}
+    const popup=document.getElementById(popupId);
+    popup.classList.toggle('show');
+    activeDp=popup.classList.contains('show')?popupId:null;
+    if(popup.classList.contains('show')){
+        let today=new Date(),s=gregorianToShamsi(today.getFullYear(),today.getMonth()+1,today.getDate());
+        let val=input.value;if(val){let p=val.split('/');if(p.length===3)s={year:+p[0],month:+p[1],day:+p[2]}}
+        if(s.year<SHAMSI_MIN_YEAR)s={year:SHAMSI_MIN_YEAR,month:1,day:1};
+        if(s.year>SHAMSI_MAX_YEAR)s={year:SHAMSI_MAX_YEAR,month:12,day:1};
+        renderDP(popupId,s.year,s.month,s.day,input);
+    }
+}
+function renderDP(id,sy,sm,sd,targetInput){
+    const popup=document.getElementById(id);
+    sy=Math.max(SHAMSI_MIN_YEAR,Math.min(SHAMSI_MAX_YEAR,sy));
+    let fd=firstDayOfMonthShamsi(sy,sm);fd=(fd+1)%7;
+    let days=shamsiMonthDays(sy,sm);
+    let prevDays=(sm>1)?shamsiMonthDays(sy,sm-1):30;
+    let today=new Date(),todayS=gregorianToShamsi(today.getFullYear(),today.getMonth()+1,today.getDate());
+
+    // Year selector
+    let yearOpts='';
+    for(let y=SHAMSI_MIN_YEAR;y<=SHAMSI_MAX_YEAR;y++)yearOpts+=`<option value="${y}"${y===sy?' selected':''}>${y}</option>`;
+
+    // Month selector
+    let monthOpts='';
+    for(let m=1;m<=12;m++)monthOpts+=`<option value="${m}"${m===sm?' selected':''}>${shamsiMonths[m-1]}</option>`;
+
+    let html=`<div class="dp-year-row">
+        <button onclick="dpYearNav('${id}',${sy-1},${sm},${sd},'${targetInput.id}')">◂</button>
+        <select onchange="dpYearChange('${id}',this.value,${sm},${sd},'${targetInput.id}')">${yearOpts}</select>
+        <button onclick="dpYearNav('${id}',${sy+1},${sm},${sd},'${targetInput.id}')">▸</button>
+    </div>
+    <div class="dp-month-row">
+        <button onclick="dpMonthNav('${id}',${sy},${sm-1},${sd},'${targetInput.id}')">◂</button>
+        <select onchange="dpMonthChange('${id}',${sy},this.value,${sd},'${targetInput.id}')">${monthOpts}</select>
+        <button onclick="dpMonthNav('${id}',${sy},${sm+1},${sd},'${targetInput.id}')">▸</button>
+    </div>
+    <div class="dp-grid">`;
+    for(let i=0;i<7;i++)html+=`<div class="dp-dow">${shamsiDOW[i]}</div>`;
+    for(let i=0;i<fd;i++)html+=`<button class="dp-day other" disabled>${prevDays-fd+i+1}</button>`;
+    for(let d=1;d<=days;d++){
+        let cls='dp-day';
+        if(d===sd)cls+=' sel';
+        if(d===todayS.day&&sm===todayS.month&&sy===todayS.year)cls+=' today';
+        html+=`<button class="${cls}" onclick="dpSelect('${id}',${sy},${sm},${d},'${targetInput.id}')">${d}</button>`;
+    }
+    let rem=42-fd-days;for(let i=1;i<=rem&&i<7;i++)html+=`<button class="dp-day other" disabled>${i}</button>`;
+    html+='</div>';
+    popup.innerHTML=html;
+}
+function dpYearNav(id,sy,sm,sd,tid){
+    sy=Math.max(SHAMSI_MIN_YEAR,Math.min(SHAMSI_MAX_YEAR,sy));
+    renderDP(id,sy,sm,sd,document.getElementById(tid));
+}
+function dpYearChange(id,sy,sm,sd,tid){
+    sy=Math.max(SHAMSI_MIN_YEAR,Math.min(SHAMSI_MAX_YEAR,+sy));
+    renderDP(id,sy,sm,sd,document.getElementById(tid));
+}
+function dpMonthNav(id,sy,sm,sd,tid){
+    if(sm<1){sm=12;sy--}if(sm>12){sm=1;sy++}
+    sy=Math.max(SHAMSI_MIN_YEAR,Math.min(SHAMSI_MAX_YEAR,sy));
+    renderDP(id,sy,sm,sd,document.getElementById(tid));
+}
+function dpMonthChange(id,sy,sm,sd,tid){
+    sm=Math.max(1,Math.min(12,+sm));
+    renderDP(id,+sy,sm,sd,document.getElementById(tid));
+}
+function dpSelect(id,sy,sm,sd,tid){
+    document.getElementById(tid).value=`${sy}/${String(sm).padStart(2,'0')}/${String(sd).padStart(2,'0')}`;
+    document.getElementById(id).classList.remove('show');activeDp=null;
+}
+document.addEventListener('click',function(e){if(activeDp&&!e.target.closest('.dp-wrapper')){document.getElementById(activeDp).classList.remove('show');activeDp=null}});
+
+
+// ══════════════════════════════════════════
+//  استپر
+// ══════════════════════════════════════════
+const stepNames=['هویتی','تحصیلی','پرسنلی','سابقه کار','تماس','مهارت‌ها','ثبت'];
+const totalSteps=7;let currentStep=1;
+function buildStepper(){
+    const c=document.getElementById('stepper');c.innerHTML='';
+    stepNames.forEach((n,i)=>{const s=i+1;c.innerHTML+=`<div class="step-item"><div class="step-dot ${s===currentStep?'active':(s<currentStep?'done':'')}" onclick="goStep(${s})" title="${n}">${s<currentStep?'✓':s}</div><div class="step-lbl">${n}</div></div>`});
+    document.getElementById('progressFill').style.width=((currentStep/totalSteps)*100)+'%';
+}
+function showStep(s){document.querySelectorAll('.sec-card').forEach(c=>c.classList.remove('active'));document.querySelector(`[data-step="${s}"]`).classList.add('active');window.scrollTo({top:document.querySelector('.stepper').offsetTop-10,behavior:'smooth'});currentStep=s;buildStepper()}
+function nextStep(){if(currentStep<totalSteps){if(!validateStep(currentStep))return;showStep(currentStep+1)}}
+function prevStep(){if(currentStep>1)showStep(currentStep-1)}
+function goStep(s){if(s<=currentStep)showStep(s)}
+buildStepper();
+
+// Validation
+function validateStep(s){
+    const card=document.querySelector(`[data-step="${s}"]`);
+    const reqs=card.querySelectorAll('[required]');
+    for(let el of reqs){
+        if(!el.value||el.value.trim()===''){
+            el.style.borderColor='var(--red)';el.style.boxShadow='0 0 0 4px rgba(211,47,47,.12)';
+            el.focus();
+            showToast('لطفاً فیلدهای الزامی (*) را پر کنید');
+            return false;
+        }
+    }
+    // gender check for step 1
+    if(s===1&&!document.querySelector('input[name=gender]:checked')){
+        showToast('لطفاً جنسیت را انتخاب کنید');return false;
+    }
+    // photo check for step 1
+    if(s===1&&!photoData){
+        showToast('آپلود عکس الزامی است. لطفاً عکس ۳×۴ خود را آپلود کنید');
+        document.getElementById('photoBox').style.borderColor='var(--red)';
+        document.getElementById('photoBox').style.boxShadow='0 0 0 4px rgba(211,47,47,.12)';
+        return false;
+    }
+    return true;
+}
+
+// Toast
+function showToast(msg){
+    let t=document.getElementById('toast');
+    if(!t){t=document.createElement('div');t.id='toast';Object.assign(t.style,{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',background:'var(--red)',color:'#fff',padding:'12px 28px',borderRadius:'10px',fontFamily:"'Vazirmatn',sans-serif",fontSize:'14px',fontWeight:'600',zIndex:'9999',boxShadow:'0 4px 20px rgba(0,0,0,.2)',opacity:'0',transition:'opacity .3s'});document.body.appendChild(t)}
+    t.textContent=msg;t.style.opacity='1';
+    setTimeout(()=>t.style.opacity='0',3000);
+}
+
+
+// ══════════════════════════════════════════
+//  رادیو
+// ══════════════════════════════════════════
+function selectRadio(label,name){document.querySelectorAll(`.radio-label[onclick*="'${name}'"]`).forEach(l=>l.classList.remove('selected'));label.classList.add('selected');label.querySelector('input').checked=true}
+
+// ══════════════════════════════════════════
+//  عکس
+// ══════════════════════════════════════════
+let photoData=null;
+const MAX_PHOTO_SIZE=2*1024*1024; // 2 MB
+function previewPhoto(input){
+    if(input.files&&input.files[0]){
+        const file=input.files[0];
+        if(file.size>MAX_PHOTO_SIZE){
+            showToast('حجم فایل بیش از ۲ مگابایت است! لطفاً فایل کوچکتر انتخاب کنید');
+            input.value='';return;
+        }
+        const reader=new FileReader();
+        reader.onload=function(e){
+            const img=document.getElementById('photoPreview');
+            img.src=e.target.result;img.style.display='block';
+            document.getElementById('photoIcon').style.display='none';
+            document.getElementById('photoText').style.display='none';
+            photoData=e.target.result;
+            // clear error state
+            document.getElementById('photoBox').style.borderColor='';
+            document.getElementById('photoBox').style.boxShadow='';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+
+// ══════════════════════════════════════════
+//  سابقه کار
+// ══════════════════════════════════════════
+let workEntries=[],workEntryCounter=0;
+function addWorkEntry(){
+    workEntryCounter++;const n=workEntryCounter;
+    document.getElementById('noEntries').style.display='none';
+    const div=document.createElement('div');div.className='work-entry';div.id=`work_${n}`;
+    div.innerHTML=`<span class="entry-num">سابقه ${n}</span><button class="remove-entry" onclick="removeWorkEntry(${n})">✕</button>
+    <div class="fg" style="margin-top:8px">
+        <div class="field"><label>نام شرکت / سازمان</label><input type="text" id="work_org_${n}" placeholder="نام سازمان قبلی"></div>
+        <div class="field"><label>سمت</label><input type="text" id="work_pos_${n}" placeholder="سمت در سازمان قبلی"></div>
+        <div class="field"><label>مدت کار (سال)</label><input type="text" id="work_dur_${n}" placeholder="مثلاً: ۳"></div>
+        <div class="field"><label>تاریخ شروع</label><div class="dp-wrapper"><input type="text" class="dp-input" id="work_start_${n}" readonly placeholder="تقویم شمسی" onclick="openDP(this,'work_dp_${n}')"><div class="dp-popup" id="work_dp_${n}"></div></div></div>
+        <div class="field"><label>تاریخ پایان</label><div class="dp-wrapper"><input type="text" class="dp-input" id="work_end_${n}" readonly placeholder="تقویم شمسی" onclick="openDP(this,'work_dpe_${n}')"><div class="dp-popup" id="work_dpe_${n}"></div></div></div>
+        <div class="field"><label>دلیل ترک کار</label><input type="text" id="work_reason_${n}" placeholder="اختیاری"></div>
+    </div>`;
+    document.getElementById('workHistory').appendChild(div);workEntries.push(n);
+}
+function removeWorkEntry(n){const el=document.getElementById(`work_${n}`);if(el){el.style.transition='opacity .3s,transform .3s';el.style.opacity='0';el.style.transform='translateY(-10px)';setTimeout(()=>{el.remove();workEntries=workEntries.filter(x=>x!==n);if(!workEntries.length)document.getElementById('noEntries').style.display='block'},300)}}
+function getWorkHistoryData(){return workEntries.map(n=>({organization:document.getElementById(`work_org_${n}`)?.value||'',position:document.getElementById(`work_pos_${n}`)?.value||'',duration:document.getElementById(`work_dur_${n}`)?.value||'',start_date:document.getElementById(`work_start_${n}`)?.value||'',end_date:document.getElementById(`work_end_${n}`)?.value||'',reason:document.getElementById(`work_reason_${n}`)?.value||''}))}
+
+
+// ══════════════════════════════════════════
+//  مهارت‌ها
+// ══════════════════════════════════════════
+let skills=[];
+function addSkill(){const inp=document.getElementById('skillInput'),val=inp.value.trim();if(!val)return;if(skills.includes(val)){inp.value='';return}skills.push(val);inp.value='';inp.focus();renderSkills()}
+function removeSkill(i){skills.splice(i,1);renderSkills()}
+function renderSkills(){document.getElementById('skillTags').innerHTML=skills.map((s,i)=>`<div class="skill-tag">${s}<button class="remove-skill" onclick="removeSkill(${i})">✕</button></div>`).join('')}
+
+
+// ══════════════════════════════════════════
+//  سالن‌های تولید — مدیریت توسط مدیر
+// ══════════════════════════════════════════
+function getHalls(){return JSON.parse(localStorage.getItem('production_halls')||'[]')}
+function saveHalls(h){localStorage.setItem('production_halls',JSON.stringify(h));sbUpsertConfig('production_halls',h);}
+function renderHalls(){
+    const halls=getHalls();
+    document.getElementById('hallList').innerHTML=halls.length?halls.map((h,i)=>`<div class="hall-item">${h}<button class="hall-del" onclick="removeHall(${i})">✕</button></div>`).join(''):'<p style="color:var(--text-muted);font-size:13px">هنوز سالنی تعریف نشده.</p>';
+    renderHallSelect();
+}
+function addHall(){
+    const inp=document.getElementById('newHallInput'),val=inp.value.trim();
+    if(!val){showToast('نام سالن را وارد کنید');return}
+    const halls=getHalls();if(halls.includes(val)){inp.value='';return}
+    halls.push(val);saveHalls(halls);inp.value='';renderHalls();showToast('سالن اضافه شد ✓');
+}
+function removeHall(i){const halls=getHalls();halls.splice(i,1);saveHalls(halls);renderHalls()}
+function renderHallSelect(){
+    const sel=document.getElementById('production_hall'),halls=getHalls();
+    const cur=sel.value;sel.innerHTML='<option value="">انتخاب سالن</option>'+halls.map(h=>`<option${h===cur?' selected':''}>${h}</option>`).join('');
+}
+
+
+// ══════════════════════════════════════════
+//  پیکربندی بخش‌ها — طراحی فرم (مثل ایپل)
+// ══════════════════════════════════════════
+const defaultSectionConfig={
+    1:{icon:'👤',title:'اطلاعات هویتی',subtitle:'تمامی فیلدها الزامی است',descTitle:'',descText:''},
+    2:{icon:'🎓',title:'اطلاعات تحصیلی',subtitle:'مدرک تحصیلی الزامی است',descTitle:'',descText:''},
+    3:{icon:'🏭',title:'اطلاعات پرسنلی',subtitle:'تمامی فیلدها الزامی است',descTitle:'',descText:''},
+    4:{icon:'🏢',title:'سابقه کار',subtitle:'شرکت و سازمان‌های قبلی',descTitle:'',descText:''},
+    5:{icon:'📞',title:'اطلاعات تماس',subtitle:'تمامی فیلدها الزامی است',descTitle:'',descText:''},
+    6:{icon:'⚡',title:'مهارت‌ها و توانمندی‌ها',subtitle:'هر مهارت را جداگانه اضافه کنید',descTitle:'',descText:''},
+    7:{icon:'✍️',title:'تأیید و ثبت نهایی',subtitle:'بررسی اطلاعات و ارسال',descTitle:'',descText:''}
+};
+
+function getSectionConfig(){return JSON.parse(localStorage.getItem('section_config')||'null')||JSON.parse(JSON.stringify(defaultSectionConfig))}
+function saveSectionConfigToStorage(cfg){localStorage.setItem('section_config',JSON.stringify(cfg));sbUpsertConfig('section_config',cfg);}
+
+function renderSectionConfigs(){
+    const cfg=getSectionConfig();
+    let html='';
+    for(let s=1;s<=7;s++){
+        const c=cfg[s];
+        html+=`<div class="section-config">
+            <div class="sc-head"><div class="sc-icon">${c.icon}</div><h3>بخش ${s}: ${c.title}</h3></div>
+            <div class="sc-field"><label>عنوان بخش</label><input type="text" id="cfg_title_${s}" value="${c.title}"></div>
+            <div class="sc-field"><label>زیرعنوان</label><input type="text" id="cfg_sub_${s}" value="${c.subtitle}"></div>
+            <div class="sc-field"><label>عنوان توضیحات (اختیاری)</label><input type="text" id="cfg_descTitle_${s}" value="${c.descTitle||''}" placeholder="مثلاً: راهنمای پرکردن"><div class="hint">اگر خالی باشد، کادر توضیحات نمایش نمی‌شود.</div></div>
+            <div class="sc-field"><label>متن توضیحات (اختیاری)</label><textarea id="cfg_descText_${s}">${c.descText||''}</textarea><div class="hint">این متن داخل کادر سبز بالای فیلدها نمایش داده می‌شود.</div></div>
+        </div>`;
+    }
+    document.getElementById('sectionConfigs').innerHTML=html;
+}
+
+function saveSectionConfigs(){
+    const cfg=getSectionConfig();
+    for(let s=1;s<=7;s++){
+        cfg[s].title=document.getElementById(`cfg_title_${s}`).value;
+        cfg[s].subtitle=document.getElementById(`cfg_sub_${s}`).value;
+        cfg[s].descTitle=document.getElementById(`cfg_descTitle_${s}`).value;
+        cfg[s].descText=document.getElementById(`cfg_descText_${s}`).value;
+    }
+    saveSectionConfigToStorage(cfg);
+    applySectionConfigToForm();
+    showToast('تنظیمات فرم ذخیره شد ✓');
+}
+
+function applySectionConfigToForm(){
+    const cfg=getSectionConfig();
+    for(let s=1;s<=7;s++){
+        const c=cfg[s];
+        const titleEl=document.getElementById(`sec${s}Title`);
+        const subEl=document.getElementById(`sec${s}Sub`);
+        if(titleEl)titleEl.textContent=c.title;
+        if(subEl)subEl.textContent=c.subtitle;
+
+        const descBox=document.getElementById(`sec${s}Desc`);
+        const descTitleEl=document.getElementById(`sec${s}DescTitle`);
+        const descTextEl=document.getElementById(`sec${s}DescText`);
+        if(descBox&&descTitleEl&&descTextEl){
+            if(c.descTitle||c.descText){
+                descBox.style.display='block';
+                descTitleEl.textContent=c.descTitle||'';
+                descTextEl.textContent=c.descText||'';
+                descTitleEl.style.display=c.descTitle?'block':'none';
+            }else{descBox.style.display='none'}
+        }
+    }
+    // Update stepper names
+    stepNames.length=0;
+    for(let s=1;s<=7;s++)stepNames.push(cfg[s].title.replace('اطلاعات ','').replace(' و توانمندی‌ها',''));
+    buildStepper();
+}
+
+
+// ══════════════════════════════════════════
+//  صفحه خوشامدگویی
+// ══════════════════════════════════════════
+function getWelcomeConfig(){return JSON.parse(localStorage.getItem('welcome_config_v3')||'null')||{text:'',logo:'',slogan:''}}
+function saveWelcomeConfigToStorage(cfg){localStorage.setItem('welcome_config_v3',JSON.stringify(cfg));sbUpsertConfig('welcome_config',cfg);}
+
+function applyWelcomeConfig(){
+    const cfg=getWelcomeConfig();
+    // Slogan
+    const sloganBox=document.getElementById('sloganBox');
+    if(cfg.slogan){
+        sloganBox.textContent=cfg.slogan;
+        sloganBox.style.display='block';
+    }else{
+        sloganBox.textContent='';
+        sloganBox.style.display='none';
+    }
+    // Welcome text
+    const welcomeDisplay=document.getElementById('welcomeTextDisplay');
+    if(cfg.text){
+        welcomeDisplay.textContent=cfg.text;
+    }else{
+        welcomeDisplay.textContent='';
+    }
+    // Logo
+    if(cfg.logo){
+        document.getElementById('logoPlaceholder').style.display='none';
+        let img=document.getElementById('logoArea').querySelector('img');
+        if(!img){img=document.createElement('img');document.getElementById('logoArea').appendChild(img)}
+        img.src=cfg.logo;
+    }
+}
+
+function setLogo(input){
+    if(input.files&&input.files[0]){
+        const reader=new FileReader();
+        reader.onload=function(e){
+            document.getElementById('logoPlaceholder').style.display='none';
+            let img=document.getElementById('logoArea').querySelector('img');
+            if(!img){img=document.createElement('img');document.getElementById('logoArea').appendChild(img)}
+            img.src=e.target.result;
+            const cfg=getWelcomeConfig();cfg.logo=e.target.result;saveWelcomeConfigToStorage(cfg);
+        };reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function setAdminLogo(input){
+    if(input.files&&input.files[0]){
+        const reader=new FileReader();
+        reader.onload=function(e){
+            const prev=document.getElementById('adminLogoPreview');
+            prev.innerHTML='';
+            const img=document.createElement('img');img.src=e.target.result;img.style.cssText='width:100%;height:100%;object-fit:contain';
+            prev.appendChild(img);
+            const cfg=getWelcomeConfig();cfg.logo=e.target.result;saveWelcomeConfigToStorage(cfg);
+            // also update welcome page
+            document.getElementById('logoPlaceholder').style.display='none';
+            let wImg=document.getElementById('logoArea').querySelector('img');
+            if(!wImg){wImg=document.createElement('img');document.getElementById('logoArea').appendChild(wImg)}
+            wImg.src=e.target.result;
+        };reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function saveWelcomeConfig(){
+    const cfg=getWelcomeConfig();
+    cfg.text=document.getElementById('adminWelcomeText').value;
+    cfg.slogan=document.getElementById('adminSloganText').value;
+    saveWelcomeConfigToStorage(cfg);
+    applyWelcomeConfig();
+    showToast('تنظیمات خوشامدگویی ذخیره شد ✓');
+}
+
+
+// ══════════════════════════════════════════
+//  رمز عبور
+// ══════════════════════════════════════════
+function getAdminPass(){return localStorage.getItem('admin_password')||'admin123'}
+function setAdminPass(p){localStorage.setItem('admin_password',p);sbUpsertConfig('admin_password',p);}
+function changePassword(){
+    const cur=document.getElementById('currentPass').value;
+    const np=document.getElementById('newPass').value;
+    const cp=document.getElementById('confirmPass').value;
+    if(cur!==getAdminPass()){showToast('رمز عبور فعلی اشتباه است');return}
+    if(!np||np.length<4){showToast('رمز جدید حداقل ۴ کاراکتر');return}
+    if(np!==cp){showToast('تکرار رمز مطابقت ندارد');return}
+    setAdminPass(np);document.getElementById('currentPass').value='';document.getElementById('newPass').value='';document.getElementById('confirmPass').value='';
+    showToast('رمز عبور تغییر کرد ✓');
+}
+
+
+// ══════════════════════════════════════════
+//  ادمین
+// ══════════════════════════════════════════
+let isAdmin=false;
+let adminPanelOpen=false;
+
+function toggleAdmin(){
+    const panel=document.getElementById('adminPanel');
+    adminPanelOpen=!adminPanelOpen;
+    if(adminPanelOpen){
+        panel.classList.add('show');
+        panel.scrollIntoView({behavior:'smooth',block:'start'});
+    }else{
+        panel.classList.remove('show');
+        // If logged in, also log out on close
+        if(isAdmin)adminLogout();
+    }
+}
+
+function adminLogin(){
+    if(document.getElementById('adminPass').value===getAdminPass()){
+        isAdmin=true;document.getElementById('adminLoginForm').style.display='none';
+        document.getElementById('adminDashboard').style.display='block';
+        renderAdminTable();renderHalls();renderSectionConfigs();
+        // بارگذاری دوباره از Supabase جهت نمایش جدیدترین رکوردها
+        sbLoadAll().then(ok=>{if(ok){renderAdminTable();renderHalls();renderSectionConfigs();}});
+        // load welcome text to admin editor
+        const wCfg=getWelcomeConfig();
+        document.getElementById('adminWelcomeText').value=wCfg.text||'';
+        document.getElementById('adminSloganText').value=wCfg.slogan||'';
+        // load logo preview
+        if(wCfg.logo){const prev=document.getElementById('adminLogoPreview');prev.innerHTML='';const img=document.createElement('img');img.src=wCfg.logo;img.style.cssText='width:100%;height:100%;object-fit:contain';prev.appendChild(img)}
+    }else{showToast('رمز عبور اشتباه')}
+}
+
+function adminLogout(){
+    isAdmin=false;document.getElementById('adminLoginForm').style.display='flex';
+    document.getElementById('adminDashboard').style.display='none';document.getElementById('adminPass').value='';
+}
+
+function switchAdminTab(tabId,btn){
+    document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');btn.classList.add('active');
+}
+
+function renderAdminTable(){
+    const search=(document.getElementById('adminSearch')?.value||'').trim().toLowerCase();
+    let records=getAllRecords();
+    if(search)records=records.filter(r=>(r.first_name||'').toLowerCase().includes(search)||(r.last_name||'').toLowerCase().includes(search)||(r.national_id||'').includes(search)||(r.personnel_code||'').includes(search)||(r.position||'').includes(search)||(r.production_hall||'').includes(search));
+
+    const all=getAllRecords();
+    const pc=p=>all.filter(r=>r.position===p).length;
+    document.getElementById('adminStats').innerHTML=`
+        <div class="stat-card" style="border-color:var(--red-border)"><div class="num">${all.length}</div><div class="lbl">کل رکوردها</div></div>
+        <div class="stat-card"><div class="num">${pc('مدیریت')}</div><div class="lbl">مدیریت</div></div>
+        <div class="stat-card"><div class="num">${pc('فنی')}</div><div class="lbl">فنی</div></div>
+        <div class="stat-card"><div class="num">${pc('اپراتور')}</div><div class="lbl">اپراتور</div></div>
+        <div class="stat-card"><div class="num">${pc('کارگر')}</div><div class="lbl">کارگر</div></div>`;
+
+    if(!records.length){document.getElementById('recordsTable').innerHTML='<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--text-muted)">📭 هنوز هیچ اطلاعاتی ثبت نشده</td></tr>';return}
+    let html=`<thead><tr><th>ردیف</th><th>نام</th><th>نام خانوادگی</th><th>کدملی</th><th>کد پرسنلی</th><th>سالن</th><th>سمت</th><th>مدرک</th><th>تلفن</th><th>تاریخ استخدام</th><th>تاریخ ثبت</th><th>عملیات</th></tr></thead><tbody>`;
+    records.forEach((r,i)=>{html+=`<tr><td>${i+1}</td><td>${r.first_name||'-'}</td><td>${r.last_name||'-'}</td><td>${r.national_id||'-'}</td><td>${r.personnel_code||'-'}</td><td>${r.production_hall||'-'}</td><td>${r.position||'-'}</td><td>${r.education_level||'-'}</td><td>${r.mobile||'-'}</td><td>${r.hire_date||'-'}</td><td>${r.created_at||'-'}</td><td><button class="action-btn view-btn" onclick="viewRecord('${r.id}')">👁️</button><button class="action-btn del-btn" onclick="if(confirm('حذف شود؟'))deleteRecord('${r.id}')">🗑️</button></td></tr>`});
+    html+='</tbody>';document.getElementById('recordsTable').innerHTML=html;
+}
+
+
+// ══════════════════════════════════════════
+//  ذخیره
+// ══════════════════════════════════════════
+function getFormData(){
+    return{id:generateId(),created_at:new Date().toLocaleString('fa-IR'),photo:photoData,
+    first_name:document.getElementById('first_name').value,last_name:document.getElementById('last_name').value,
+    father_name:document.getElementById('father_name').value,birth_date:document.getElementById('birth_date').value,
+    birth_place:document.getElementById('birth_place').value,national_id:document.getElementById('national_id').value,
+    gender:document.querySelector('input[name=gender]:checked')?.value||'',
+    marital_status:document.getElementById('marital_status').value,children_count:document.getElementById('children_count').value,
+    nationality:document.getElementById('nationality').value,blood_type:document.getElementById('blood_type').value,
+    education_level:document.getElementById('education_level').value,education_field:document.getElementById('education_field').value,
+    production_hall:document.getElementById('production_hall').value,personnel_code:document.getElementById('personnel_code').value,
+    hire_date:document.getElementById('hire_date').value,position:document.getElementById('position').value,
+    work_history:getWorkHistoryData(),mobile:document.getElementById('mobile').value,
+    phone:document.getElementById('phone').value,emergency_phone:document.getElementById('emergency_phone').value,
+    address:document.getElementById('address').value,skills:skills.join('، ')}
+}
+function generateId(){return 'P'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).substr(2,4).toUpperCase()}
+function getAllRecords(){return JSON.parse(localStorage.getItem('personnel_records_v3')||'[]')}
+function saveRecord(record){let r=getAllRecords();r.push(record);localStorage.setItem('personnel_records_v3',JSON.stringify(r));sbUpsertRecord(record);}
+function deleteRecord(id){let r=getAllRecords().filter(x=>x.id!==id);localStorage.setItem('personnel_records_v3',JSON.stringify(r));sbDeleteRecord(id);renderAdminTable()}
+
+
+// ══════════════════════════════════════════
+//  ثبت فرم
+// ══════════════════════════════════════════
+function submitForm(){
+    for(let s=1;s<=7;s++){if(!validateStep(s)){showStep(s);return}}
+    const nid=document.getElementById('national_id').value.trim();
+    if(getAllRecords().find(r=>r.national_id===nid)){showToast('این کدملی قبلاً ثبت شده');return}
+    if(!document.getElementById('agreeCheck').checked){showToast('لطفاً توافق‌نامه را تأیید کنید');return}
+    if(!photoData){showToast('آپلود عکس الزامی است');return}
+    const record=getFormData();saveRecord(record);
+    document.getElementById('formPage').classList.remove('show');
+    document.getElementById('refCode').textContent=record.id;
+    document.getElementById('successPage').classList.add('show');
+}
+
+
+// ══════════════════════════════════════════
+//  ناوبری
+// ══════════════════════════════════════════
+function goToForm(){
+    document.getElementById('welcomePage').style.display='none';
+    document.getElementById('formPage').classList.add('show');window.scrollTo({top:0,behavior:'smooth'});
+}
+function newForm(){
+    document.getElementById('successPage').classList.remove('show');
+    document.getElementById('welcomePage').style.display='flex';
+    document.querySelectorAll('#formPage input[type=text],#formPage input[type=tel],#formPage input[type=number],#formPage textarea').forEach(i=>i.value='');
+    document.querySelectorAll('#formPage select').forEach(s=>s.selectedIndex=0);
+    document.querySelectorAll('#formPage input[type=radio]').forEach(r=>r.checked=false);
+    document.querySelectorAll('.radio-label').forEach(l=>l.classList.remove('selected'));
+    document.getElementById('agreeCheck').checked=false;document.getElementById('submitBtn').disabled=true;
+    photoData=null;document.getElementById('photoPreview').style.display='none';document.getElementById('photoIcon').style.display='';document.getElementById('photoText').style.display='';
+    skills=[];renderSkills();workEntries=[];workEntryCounter=0;
+    document.getElementById('workHistory').innerHTML='<div class="no-entries" id="noEntries">هنوز سابقه کاری اضافه نشده.</div>';
+    document.getElementById('nationality').value='ایرانی';document.getElementById('children_count').value='0';
+    currentStep=1;buildStepper();showStep(1);
+    // close admin panel if open
+    if(adminPanelOpen){adminPanelOpen=false;document.getElementById('adminPanel').classList.remove('show');if(isAdmin)adminLogout()}
+}
+
+
+// ══════════════════════════════════════════
+//  مودال مشاهده
+// ══════════════════════════════════════════
+function viewRecord(id){
+    const r=getAllRecords().find(x=>x.id===id);if(!r)return;
+    const v=x=>x||'<span style="color:#999;font-style:italic">—</span>';
+    const photoHtml=r.photo?`<img src="${r.photo}" class="modal-photo">`:'<div style="width:80px;height:100px;background:var(--gray-bg);border:2px dashed var(--red-border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--text-muted)">📷</div>';
+    let workHtml='';
+    if(r.work_history&&r.work_history.length)workHtml=r.work_history.map(w=>`<div class="modal-work-entry"><div class="modal-info-grid"><div class="modal-info-item"><div class="mlbl">سازمان</div><div class="mval">${v(w.organization)}</div></div><div class="modal-info-item"><div class="mlbl">سمت</div><div class="mval">${v(w.position)}</div></div><div class="modal-info-item"><div class="mlbl">مدت</div><div class="mval">${v(w.duration)}</div></div><div class="modal-info-item"><div class="mlbl">دلیل ترک</div><div class="mval">${v(w.reason)}</div></div><div class="modal-info-item"><div class="mlbl">شروع</div><div class="mval">${v(w.start_date)}</div></div><div class="modal-info-item"><div class="mlbl">پایان</div><div class="mval">${v(w.end_date)}</div></div></div></div>`).join('');
+    else workHtml='<p style="color:var(--text-muted);font-style:italic">سابقه‌ای ثبت نشده</p>';
+
+    document.getElementById('modalContent').innerHTML=`
+    <div style="display:flex;gap:18px;align-items:flex-start;margin-bottom:18px">${photoHtml}<div><h2 style="margin:0;border:none;padding:0">${v(r.first_name)} ${v(r.last_name)}</h2><p style="font-size:12px;color:var(--gray);margin-top:4px">کد رهگیری: ${r.id} | کد پرسنلی: ${v(r.personnel_code)}</p></div></div>
+    <div class="modal-section"><div class="modal-section-title">👤 هویتی</div><div class="modal-info-grid"><div class="modal-info-item"><div class="mlbl">نام پدر</div><div class="mval">${v(r.father_name)}</div></div><div class="modal-info-item"><div class="mlbl">تاریخ تولد</div><div class="mval">${v(r.birth_date)}</div></div><div class="modal-info-item"><div class="mlbl">محل تولد</div><div class="mval">${v(r.birth_place)}</div></div><div class="modal-info-item"><div class="mlbl">کدملی</div><div class="mval">${v(r.national_id)}</div></div><div class="modal-info-item"><div class="mlbl">جنسیت</div><div class="mval">${v(r.gender)}</div></div><div class="modal-info-item"><div class="mlbl">وضعیت تاهل</div><div class="mval">${v(r.marital_status)}</div></div><div class="modal-info-item"><div class="mlbl">فرزندان</div><div class="mval">${v(r.children_count)}</div></div><div class="modal-info-item"><div class="mlbl">گروه خونی</div><div class="mval">${v(r.blood_type)}</div></div></div></div>
+    <div class="modal-section"><div class="modal-section-title">🎓 تحصیلی</div><div class="modal-info-grid"><div class="modal-info-item"><div class="mlbl">مدرک</div><div class="mval">${v(r.education_level)}</div></div><div class="modal-info-item"><div class="mlbl">رشته</div><div class="mval">${v(r.education_field)}</div></div></div></div>
+    <div class="modal-section"><div class="modal-section-title">🏭 پرسنلی</div><div class="modal-info-grid"><div class="modal-info-item"><div class="mlbl">سالن تولید</div><div class="mval">${v(r.production_hall)}</div></div><div class="modal-info-item"><div class="mlbl">کد پرسنلی</div><div class="mval">${v(r.personnel_code)}</div></div><div class="modal-info-item"><div class="mlbl">تاریخ استخدام</div><div class="mval">${v(r.hire_date)}</div></div><div class="modal-info-item"><div class="mlbl">سمت</div><div class="mval">${v(r.position)}</div></div></div></div>
+    <div class="modal-section"><div class="modal-section-title">🏢 سابقه کار</div>${workHtml}</div>
+    <div class="modal-section"><div class="modal-section-title">📞 تماس</div><div class="modal-info-grid"><div class="modal-info-item"><div class="mlbl">تلفن همراه</div><div class="mval">${v(r.mobile)}</div></div><div class="modal-info-item"><div class="mlbl">تلفن ثابت</div><div class="mval">${v(r.phone)}</div></div><div class="modal-info-item"><div class="mlbl">شماره ضروری</div><div class="mval">${v(r.emergency_phone)}</div></div><div class="modal-info-item"><div class="mlbl">آدرس</div><div class="mval">${v(r.address)}</div></div></div></div>
+    <div class="modal-section"><div class="modal-section-title">⚡ مهارت‌ها</div><div>${r.skills?`<div class="skill-tags">${r.skills.split('، ').map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>`:'وارد نشده'}</div></div>
+    <p style="margin-top:18px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--gray-light);padding-top:10px">تاریخ ثبت: ${v(r.created_at)}</p>`;
+    document.getElementById('viewModal').classList.add('show');
+}
+function closeModal(){document.getElementById('viewModal').classList.remove('show')}
+
+
+// ══════════════════════════════════════════
+//  خروجی اکسل
+// ══════════════════════════════════════════
+function exportExcel(){
+    const records=getAllRecords();if(!records.length){showToast('داده‌ای برای خروجی وجود ندارد');return}
+    const headers=['ردیف','نام','نام خانوادگی','نام پدر','تاریخ تولد','محل تولد','کدملی','جنسیت','وضعیت تاهل','فرزندان','گروه خونی','مدرک','رشته','سالن تولید','کد پرسنلی','تاریخ استخدام','سمت','تلفن همراه','تلفن ثابت','شماره ضروری','آدرس','مهارت‌ها','سوابق کاری','تاریخ ثبت'];
+    let csv='\uFEFF';csv+=headers.join(',')+'\n';
+    records.forEach((r,i)=>{const ws=(r.work_history||[]).map(w=>`${w.organization||'-'} (${w.position||'-'}, ${w.duration||'-'})`).join(' | ');
+    csv+=[i+1,cS(r.first_name),cS(r.last_name),cS(r.father_name),cS(r.birth_date),cS(r.birth_place),cS(r.national_id),cS(r.gender),cS(r.marital_status),r.children_count||0,cS(r.blood_type),cS(r.education_level),cS(r.education_field),cS(r.production_hall),cS(r.personnel_code),cS(r.hire_date),cS(r.position),cS(r.mobile),cS(r.phone),cS(r.emergency_phone),cS(r.address),cS(r.skills),cS(ws),cS(r.created_at)].join(',')+'\n'});
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`personnel_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
+}
+function cS(v){if(!v)return'';v=String(v).replace(/"/g,'""');if(v.includes(',')||v.includes('\n')||v.includes('"'))return '"'+v+'"';return v}
+
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+(function init(){
+    // ابتدا با کش محلی رندر می‌کنیم (نمایش سریع)
+    applyWelcomeConfig();
+    applySectionConfigToForm();
+    renderHallSelect();
+    // سپس از Supabase داده‌های تازه را بارگذاری و دوباره رندر می‌کنیم
+    sbLoadAll().then(ok=>{
+        if(ok){
+            applyWelcomeConfig();
+            applySectionConfigToForm();
+            renderHallSelect();
+            if(typeof isAdmin!=='undefined'&&isAdmin){try{renderAdminTable();renderHalls();renderSectionConfigs();}catch(e){}}
+        }
+    });
+})();
+</script>
+</body>
+</html>
